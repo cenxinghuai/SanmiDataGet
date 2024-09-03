@@ -1,0 +1,15 @@
+def down_sanmi_item_data(url, login_form):
+    sanmi_html = url_req(url)
+    sanmi_user_page = sanmi_user_longin(html_page, login_form)
+    get_item_data(sanmi_user_page)
+
+def make_sanmi_item_table(url, login_form):
+    sanmi_item_data = down_sanmi_item_data(url, phone, store_number, employee_account, employee_password)
+    xls_table = make_xls_table(sanmi_item_data)
+    save_xls_table(xls_table)
+
+if __name__ == '__main__':
+    "url, phone, store_number, employee_account, employee_password"
+    url = ''
+    login_form = {}
+    make_sanmi_item_table(url, phone, store_number, employee_account, employee_password)
