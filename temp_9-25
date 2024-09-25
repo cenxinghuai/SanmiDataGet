@@ -1,0 +1,144 @@
+from selenium import webdriver  
+from selenium.webdriver.chrome.service import Service  
+from selenium.webdriver.chrome.options import Options  
+from selenium.webdriver.common.by import By  
+from selenium.webdriver.support.ui import WebDriverWait  
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains 
+from selenium.common.exceptions import TimeoutException  
+import time
+
+
+
+def sanmi_longin(url, login_form):
+    # 变量初始化
+    path = login_form.get("path")
+    browser = ''
+    ser = ''
+    chrome_options = ''
+    wait = ''
+
+    # 页面请求
+    s = Service(path)  
+    chrome_options = Options()  
+    chrome_options.add_argument('--start-maximized')  
+    browser = webdriver.Chrome(service=s, options=chrome_options) 
+    browser.get(url)
+    wait = WebDriverWait(browser, 10)
+
+    try:
+        # 登录
+        # 使用显式等待等待某个元素出现（这里只是示例，可能需要替换为实际的元素定位器）  
+        wait = WebDriverWait(browser, 10)  # 最多等待秒  
+        # 使用 CSS 选择器定位具有特定 placeholder 的 input 元素  
+        phone_number_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[placeholder="商户绑定手机号"]')))
+        employee_account_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[placeholder="登陆员工工号"]'))) 
+        employee_password_input = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[placeholder="登录员工密码"]'))) 
+
+        # 在输入框中输入账号内容  
+        phone_number = "17621566169"    
+        employee_account = "1001"
+        employee_password = "1001"
+        
+        phone_number_input.send_keys(phone_number)# 输入商户手机号
+        # 选择门店
+        dropdown_trigger = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'el-select__caret')))
+        dropdown_trigger.click()
+        dropdown_trigger.click()
+        option_to_select = wait.until(EC.element_to_be_clickable((By.XPATH, '//li[@class="el-select-dropdown__item"]//div[@class="x-flex"]//div[contains(text(), "00010002")]')))
+        option_to_select.click()
+        # 输入工号密码
+        employee_account_input.send_keys(employee_account)
+        employee_password_input.send_keys(employee_password)
+
+        # 登录
+        # print(browser.page_source)
+        login_button = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "el-button")))
+        login_button.click()
+
+        return browser
+
+    except Exception as e:
+        print(f"等待元素时出错: {e}")
+
+def get_item_data(browser_of_sanmi_longin_res):
+    browser = browser_of_sanmi_longin_res
+    wait = WebDriverWait(browser, 10)
+
+    try:
+
+        # 基础
+        infinite_list = wait.until(EC.element_to_be_clickable((By.XPATH, "//ul[@class='infinite-list']//li[contains(text(), '基础')]")))
+        infinite_list.click()
+
+        # 商品档案        
+        text_to_find_dangan = '商品档案'
+        js_code_dangan = """  
+        (function(text) {  
+            var listItems = document.querySelectorAll('li');  
+            listItems.forEach(function(listItem) {  
+                if (listItem.textContent.trim().includes(text)) {  
+                    listItem.click();  
+                    // 注意：这里的console.log在Selenium中不会显示  
+                }  
+            });  
+        })(arguments[1]);
+        """  
+        browser.execute_script(js_code_dangan, text_to_find_dangan, text_to_find_dangan)
+        # time.sleep(10)
+
+        # 商品列表
+        wait = WebDriverWait(browser, 10)  
+        # 使用 visibility_of_all_elements_located 来获取所有可见的元素  
+        divs = wait.until(EC.visibility_of_all_elements_located((By.CLASS_NAME, "ellipse")))  
+
+        # 遍历所有找到的元素  
+        for div in divs:  
+            # 检查元素的文本是否包含 "肉"  
+            if "肉" in div.text.strip():  
+                # 注意：这里 div.text 已经是字符串，不需要调用 div.text()  
+                div.click()  
+                print(f"Clicked the div with text containing: 肉 and class: ellipse")
+        time.sleep(30)
+        # print(browser.page_source)
+        print("\n页面加载完成，元素可用\n")
+        return browser
+    except Exception as e:
+        print(f"等待元素时出错: {e}")
+
+
+def sift_item_data(item_page):
+    item_name = get_item_name(item_page)
+    # item_code = get_item_code(item_page)
+    # item_price = get_item_price(item_page)
+
+def down_sanmi_item_page(url, login_form):
+    # 登录
+    browser_of_sanmi_longin_res = sanmi_longin(url, login_form)
+
+    # 获取商品档案页面
+    item_page = get_item_data(browser_of_sanmi_longin_res)
+    # item_data = sift_item_data(item_page)
+    # return item_data
+
+def make_sanmi_item_table(sanmi_item_data):
+    pass
+    # xls_table = make_xls_table(sanmi_item_data)
+    # save_xls_table(xls_table)
+
+def get_items_info_data(items_info):
+    
+    items_info_data = 
+
+
+def down_sanmi_item_data_and_make_sanmi_item_table(url, login_form, items_info):
+    sanmi_item_page = down_sanmi_item_page(url, login_form)
+    items_info_data = get_items_info_data(sanmi_item_page, items_info)
+    # sanmi_item_table = make_sanmi_item_table(sanmi_item_data)
+
+if __name__ == '__main__':
+    "url, phone, store_number, employee_account, employee_password"
+    url = 'https://soft.sanmipos.com/smSellAdmin/index.html#/login'
+    login_form = {"path": "D:/文件处理/chromedriver-win64/chromedriver.exe",}
+    items_info = ''
+    down_sanmi_item_data_and_make_sanmi_item_table(url, login_form, items_info)
